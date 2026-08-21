@@ -1,4 +1,15 @@
-export function renderErrorPage(): string {
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+export function renderErrorPage(error?: unknown): string {
+  let errorHtml = "";
+  if (error instanceof Error) {
+    errorHtml = `<details style="text-align:left; margin-top:1rem; background:#f3f4f6; color:#1f2937; padding:0.75rem; border-radius:0.5rem; font-size:0.8rem; overflow:auto;"><summary style="cursor:pointer; font-weight:600;">Show Error Details</summary><pre style="white-space:pre-wrap; margin-top:0.5rem; font-family:monospace;">${escapeHtml(error.name)}: ${escapeHtml(error.message)}${error.stack ? `\n\n${escapeHtml(error.stack)}` : ""}</pre></details>`;
+  } else if (error != null) {
+    errorHtml = `<details style="text-align:left; margin-top:1rem; background:#f3f4f6; color:#1f2937; padding:0.75rem; border-radius:0.5rem; font-size:0.8rem; overflow:auto;"><summary style="cursor:pointer; font-weight:600;">Show Error Details</summary><pre style="white-space:pre-wrap; margin-top:0.5rem; font-family:monospace;">${escapeHtml(String(error))}</pre></details>`;
+  }
+
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -20,7 +31,8 @@ export function renderErrorPage(): string {
     <div class="card">
       <h1>This page didn't load</h1>
       <p>Something went wrong on our end. You can try refreshing or head back home.</p>
-      <div class="actions">
+      ${errorHtml}
+      <div class="actions" style="margin-top: 1.5rem;">
         <button class="primary" onclick="location.reload()">Try again</button>
         <a class="secondary" href="/">Go home</a>
       </div>
@@ -28,3 +40,4 @@ export function renderErrorPage(): string {
   </body>
 </html>`;
 }
+
