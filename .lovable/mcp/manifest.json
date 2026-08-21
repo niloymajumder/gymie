@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://nbemdhccocpirfwqjhkp.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "gymie",
+      "version": "0.1.0",
+      "title": "Gymie"
+    },
+    "tools": [
+      {
+        "name": "get_nutrition_targets",
+        "title": "Get nutrition targets",
+        "description": "Get the signed-in user's Gymie profile: biometrics, goal, and daily calorie, protein, carb, fat and water targets.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "search_foods",
+        "title": "Search the food database",
+        "description": "Search Gymie's Bangladeshi and general food database by English or Bangla name and return per-serving macros.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Food name to look for, English or Bangla."
+            },
+            "limit": {
+              "description": "Max results. Defaults to 8.",
+              "type": "number"
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "log_meal",
+        "title": "Log a meal",
+        "description": "Log a meal with one or more foods (name, portion and macros) into the signed-in user's Gymie diary for a given day.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "meal_type": {
+              "type": "string",
+              "enum": [
+                "breakfast",
+                "lunch",
+                "dinner",
+                "snack"
+              ],
+              "description": "Which meal this belongs to."
+            },
+            "date": {
+              "description": "Day in YYYY-MM-DD (Asia/Dhaka). Defaults to today.",
+              "type": "string"
+            },
+            "note": {
+              "description": "Optional note about the meal.",
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Food name, English or Bangla."
+                  },
+                  "quantity_label": {
+                    "type": "string",
+                    "description": "Portion, e.g. '1 plate', '2 pieces', '250 g'."
+                  },
+                  "calories": {
+                    "type": "number",
+                    "description": "Calories in kcal for this portion."
+                  },
+                  "protein_g": {
+                    "type": "number",
+                    "description": "Protein in grams."
+                  },
+                  "carbs_g": {
+                    "type": "number"
+                  },
+                  "fat_g": {
+                    "type": "number"
+                  },
+                  "fiber_g": {
+                    "type": "number"
+                  },
+                  "sugar_g": {
+                    "type": "number"
+                  },
+                  "sodium_mg": {
+                    "type": "number"
+                  },
+                  "confidence": {
+                    "description": "How confident the macro values are. Defaults to medium.",
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "estimated"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "quantity_label",
+                  "calories",
+                  "protein_g"
+                ]
+              },
+              "description": "Foods eaten in this meal."
+            }
+          },
+          "required": [
+            "meal_type",
+            "items"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_food_diary",
+        "title": "Get food diary for a day",
+        "description": "Read the signed-in user's Gymie food diary for one day: every logged meal with its foods and macros, plus daily totals, water, weight and gym status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "date": {
+              "description": "Day to read in YYYY-MM-DD (Asia/Dhaka). Defaults to today.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "log_daily_stat",
+        "title": "Log water, weight or gym",
+        "description": "Log the signed-in user's water intake, bodyweight, or gym attendance for a day in Gymie.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "water_ml": {
+              "description": "Water to add in millilitres (can be negative to undo).",
+              "type": "number"
+            },
+            "weight_kg": {
+              "description": "Bodyweight in kilograms for this day.",
+              "type": "number"
+            },
+            "gym_attended": {
+              "description": "Whether the user trained on this day.",
+              "type": "boolean"
+            },
+            "date": {
+              "description": "Day in YYYY-MM-DD (Asia/Dhaka). Defaults to today.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_progress",
+        "title": "Get progress trend",
+        "description": "Get the signed-in user's recent Gymie trend: daily calories and protein, water, gym days, and bodyweight logs over the last N days.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "days": {
+              "description": "How many days back to include. Defaults to 30.",
+              "type": "number"
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
