@@ -38,14 +38,16 @@ function createSupabaseAdminClient() {
       ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
       ...(!SUPABASE_SERVICE_ROLE_KEY ? ['SUPABASE_SERVICE_ROLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Netlify Environment Variables.`;
+    console.warn(`[Supabase Admin] ${message}`);
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  const url = SUPABASE_URL || 'https://placeholder.supabase.co';
+  const key = SUPABASE_SERVICE_ROLE_KEY || 'sb_secret_placeholder';
+
+  return createClient<Database>(url, key, {
     global: {
-      fetch: createSupabaseFetch(SUPABASE_SERVICE_ROLE_KEY),
+      fetch: createSupabaseFetch(key),
     },
     auth: {
       storage: undefined,
@@ -53,6 +55,7 @@ function createSupabaseAdminClient() {
       autoRefreshToken: false,
     }
   });
+
 }
 
 let _supabaseAdmin: ReturnType<typeof createSupabaseAdminClient> | undefined;
