@@ -6,4 +6,7 @@ export default defineConfig({
     // for the SSR error wrapper.
     server: { entry: "server" },
   },
+  nitro: {
+    preset: process.env.NITRO_PRESET || "cloudflare_pages",
+  },
 });
